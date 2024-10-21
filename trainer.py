@@ -231,13 +231,16 @@ class IMUModelTrainer:
         print(f'F1 Score: {f1:.4f}')
 
         # Confusion Matrix
+        # Confusion Matrix
         cm = confusion_matrix(all_labels, all_predictions)
         disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-        disp.plot()
+        fig, ax = plt.subplots(figsize=(10, 8))
+        disp.plot(ax=ax, cmap='Blues')  # Using 'Blues' color map to make the colors softer
         plt.title('Confusion Matrix')
         plt.savefig(os.path.join(self.output_dir, 'confusion_matrix.png'))
         plt.close()
         print("Confusion matrix has been saved to 'confusion_matrix.png'.")
+
 
         # ROC Curve (for each class)
         plt.figure(figsize=(10, 6))
