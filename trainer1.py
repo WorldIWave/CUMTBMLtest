@@ -10,6 +10,8 @@ from model import CNNWithSVM, CNNFeatureExtractor, MultiClassHingeLoss
 from sklearn.model_selection import KFold
 from torch.utils.data import TensorDataset, DataLoader
 from collections import defaultdict
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_curve, auc, confusion_matrix, ConfusionMatrixDisplay
+
 
 class IMUDataProcessor:
     def __init__(self, file_path, window_size=100, step_size=50):
@@ -188,8 +190,11 @@ class IMUModelTrainer:
         self.plot_training_loss(epoch_losses, epoch_val_losses)
 
     def evaluate(self, test_loader):
-        """Evaluate the model on the test set and calculate per-label accuracy."""
+        """Evaluate the model on the test set and calculate per-label accuracy, precision, recall, F1 score, ROC curve, and confusion matrix."""
         self.model.eval()
+        all_labels = []
+        all_predictions = []
+        all_probabilities = []
         correct = 0
         total = 0
         label_correct = defaultdict(int)
@@ -200,6 +205,12 @@ class IMUModelTrainer:
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
                 outputs = self.model(inputs)
                 _, predicted = torch.max(outputs, 1)
+                probabilities = torch.softmax(outputs, dim=1)
+
+                all_labels.extend(labels.cpu().numpy())
+                all_predictions.extend(predicted.cpu().numpy())
+                all_probabilities.extend(probabilities.cpu().numpy())
+
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
@@ -208,16 +219,51 @@ class IMUModelTrainer:
                     if label == prediction:
                         label_correct[label.item()] += 1
 
-        accuracy = correct / total
-        print(f'Test Accuracy: {accuracy:.4f}')
+        # Calculate metrics
+        accuracy = accuracy_score(all_labels, all_predictions)
+        precision = precision_score(all_labels, all_predictions, average='weighted')
+        recall = recall_score(all_labels, all_predictions, average='weighted')
+        f1 = f1_score(all_labels, all_predictions, average='weighted')
 
-        # Calculate per-label accuracy
-        for label in range(self.num_classes):
-            if label_total[label] > 0:
-                label_accuracy = label_correct[label] / label_total[label]
-                print(f'Accuracy for label {label + 1}: {label_accuracy:.4f}')
+        print(f'Accuracy: {accuracy:.4f}')
+        print(f'Precision: {precision:.4f}')
+        print(f'Recall: {recall:.4f}')
+        print(f'F1 Score: {f1:.4f}')
 
+        # Confusion Matrix
+        cm = confusion_matrix(all_labels, all_predictions)
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        disp.plot()
+        plt.title('Confusion Matrix')
+        plt.savefig(os.path.join(self.output_dir, 'confusion_matrix.png'))
+        plt.close()
+        print("Confusion matrix has been saved to 'confusion_matrix.png'.")
+
+        # ROC Curve (for each class)
+        plt.figure(figsize=(10, 6))
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in range(self.num_classes):
+            y_true_binary = [1 if label == i else 0 for label in all_labels]
+            y_score = [prob[i] for prob in all_probabilities]
+            fpr[i], tpr[i], _ = roc_curve(y_true_binary, y_score)
+            roc_auc[i] = auc(fpr[i], tpr[i])
+            plt.plot(fpr[i], tpr[i], label=f'Class {i+1} (AUC = {roc_auc[i]:.2f})')
+
+        plt.plot([0, 1], [0, 1], 'k--')
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('ROC Curve for Each Class')
+        plt.legend(loc='lower right')
+        plt.grid(True)
+        plt.savefig(os.path.join(self.output_dir, 'roc_curve.png'))
+        plt.close()
+        print("ROC curve has been saved to 'roc_curve.png'.")
+
+        # Original return values
         return correct, total, label_correct, label_total
+
 
     def evaluate_loss(self, data_loader):
         """Evaluate the model to calculate the average loss on the given dataset."""
