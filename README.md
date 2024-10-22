@@ -1,1 +1,103 @@
-# CUMTBMLtest
+IMU 分类项目
+
+1. 项目介绍
+
+本项目是一个基于惯性测量单元（IMU）数据的人体活动分类系统，使用卷积神经网络（CNN）与 SVM 风格的间隔损失来提取特征并进行分类。项目模块包括：
+
+dataload.py: 数据加载与预处理。
+
+dataprocess.py: 数据分割、滤波和标准化处理。
+
+models.py: 定义神经网络架构和损失函数。
+
+trainer.py: 负责模型训练、评估和结果可视化。
+
+2. 快速开始
+
+2.1 环境配置
+
+请确保已安装以下依赖：
+
+Python >= 3.7
+
+pip
+
+2.2 安装步骤
+
+# 克隆代码仓库
+git clone <repository-url>
+cd <repository-folder>
+
+# 创建虚拟环境并激活
+python -m venv imu_env
+# Windows
+imu_env\Scripts\activate
+# MacOS/Linux
+source imu_env/bin/activate
+
+# 安装依赖库
+pip install -r requirements.txt
+
+requirements.txt 文件包括以下库：
+
+numpy
+pandas
+matplotlib
+scikit-learn
+torch
+tqdm
+joblib
+
+2.3 运行项目
+
+数据预处理
+
+使用 dataprocess.py 进行数据预处理：
+
+python dataprocess.py
+
+数据加载
+
+使用 dataload.py 加载数据：
+
+python dataload.py
+
+训练模型
+
+使用 trainer.py 训练模型：
+
+python trainer.py
+
+训练完成后，模型权重和评估结果会保存在 output 目录中。
+
+2.4 输出文件
+
+segments.npy: 预处理后的数据片段。
+
+labels.npy: 每个数据片段的标签。
+
+cnn_model.pth: 训练好的模型权重。
+
+confusion_matrix.png: 混淆矩阵图。
+
+roc_curve.png: 每个类别的 ROC 曲线。
+
+training_validation_loss_curve.png: 训练和验证损失曲线。
+
+3. 项目结构
+
+dataload.py: 数据加载与准备。
+
+dataprocess.py: 数据处理与标准化。
+
+models.py: 定义 CNN 和 SVM 分类器。
+
+trainer.py: 模型训练和评估。
+
+4. 结果
+
+模型训练完成后，可以通过准确率、精确率、召回率、F1 分数和 ROC 曲线等指标来评估模型性能。评估结果会打印在控制台并保存为图片。
+
+5. 联系方式
+
+如有任何问题，请联系 [你的联系方式或 GitHub issues 页面]。# CUMTBMLtest
