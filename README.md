@@ -34,6 +34,31 @@ Anaconda/Miniconda
 
 ### 2.2 安装步骤
 
+首先确保本地有conda环境，使用conda环境创建一个虚拟环境
+```
+conda create -n MLtest python=3.8
+```
+
+然后激活如下：
+```
+conda activate MLtest
+```
+
+安装torch：
+使用命令查看本地cuda和显卡驱动版本：
+```
+nvcc -V(查看cuda)
+```
+```
+nvidia-smi(查看显卡驱动)
+```
+
+选择与自己cuda和显卡驱动兼容的版本，如下选择cu118
+```
+pip install torch==2.3.0+cu118
+```
+
+安装requirements中要求的包：
 ```
 pip install -r requirements.txt
 ```
@@ -44,13 +69,20 @@ numpy
 pandas
 matplotlib
 scikit-learn
-torch
 tqdm
 joblib
-
 ```
 
 ### 2.3 运行项目
+
+#### 数据加载
+
+使用 dataload.py 加载数据：
+```
+python dataload.py
+```
+加载.mat文件，并且可视化每个.mat文件中的数据，可视化图像保存在USC文件夹下。
+
 
 #### 数据预处理
 
@@ -59,15 +91,8 @@ joblib
 python dataprocess.py
 ```
 
-该脚本会清洗原始数据，应用低通滤波器，并将数据分割成固定大小的窗口，处理后的数据会保存为 .npy 文件。
+清洗原始数据，应用低通滤波器进行去噪（默认截止频率为5Hz），然后使用滑动窗口增加数据样本点，得到数据后进行归一化转为张量方便后续神经网络进行训练，处理后的数据会保存为 .npy 文件。
 
-#### 数据加载
-
-使用 dataload.py 加载数据：
-```
-python dataload.py
-```
-该脚本会准备数据，进行标准化处理并转换为 PyTorch 张量。
 
 #### 训练模型
 
