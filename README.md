@@ -29,7 +29,10 @@ Anaconda/Miniconda
 
 ```
 pip install -r requirements.txt
+```
+
 文件包括以下库：
+```
 numpy
 pandas
 matplotlib
@@ -45,25 +48,26 @@ joblib
 数据预处理
 
 使用 dataprocess.py 进行数据预处理：
-
+```
 python dataprocess.py
+```
 
 该脚本会清洗原始数据，应用低通滤波器，并将数据分割成固定大小的窗口，处理后的数据会保存为 .npy 文件。
 
 数据加载
 
 使用 dataload.py 加载数据：
-
+```
 python dataload.py
-
+```
 该脚本会准备数据，进行标准化处理并转换为 PyTorch 张量。
 
 训练模型
 
 使用 trainer.py 训练模型：
-
+```
 python trainer.py
-
+```
 训练过程中会显示每一折的训练状态和验证指标，训练好的模型权重和评估结果会保存在 output 目录中。
 
 2.4 输出文件
@@ -94,9 +98,9 @@ trainer.py: 模型训练和评估。
 
 4. 结果
 
-模型训练完成后，可以通过准确率、精确率、召回率、F1 分数和 ROC 曲线等指标来评估模型性能。评估结果会打印在控制台并保存为图片。
+模型训练完成后，可以通过准确率、精确率、召回率、F1 分数和 ROC 曲线等指标来评估模型性能。评估结果会打印在终端并保存为图片。
 
-评估指标
+评估指标(Benchmarks)
 
 准确率: 衡量整体分类性能。
 
@@ -106,7 +110,4 @@ trainer.py: 模型训练和评估。
 
 ROC 曲线和 AUC: 显示每个类别的分类性能。
 
-5. 联系方式
-
-如有任何问题，请访问 GitHub issues 页面 进行反馈。
 
